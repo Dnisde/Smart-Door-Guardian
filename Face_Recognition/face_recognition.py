@@ -56,7 +56,7 @@ class Face_Recognition:
 		# allow the camera sensor to warm up
 		print("[INFO] starting video stream...")
 		# Using Pi-Camera at here:
-		vs = VideoStream(usePiCamera=True).start()
+		vs = VideoStream(-1).start()
 		# Wait for the camera to warm up
 		time.sleep(2.0)
 
@@ -68,8 +68,9 @@ class Face_Recognition:
 		while True:
 			# Grab a specific frame from the threaded video stream
 			# Grab the frame from the threaded video stream and resize it to 500px (to speedup processing)
-			frame = vs.read()
-			frame = imutils.resize(frame, width=500)
+			_, frame = vs.read()
+			(w, h, c) = frame.shape
+			frame = cv2.resize(frame, (400, h))
 
 			# convert the input frame from
 			# (1) BGR to grayscale (for face detection)
@@ -77,11 +78,15 @@ class Face_Recognition:
 			gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
 			rgb = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
 			# detect faces in the grayscale frame
-			rects = detector.detectMultiScale(gray, scaleFactor=1.1, minNeighbors=5, minSize=(30, 30))
 
 			# OpenCV returns bounding box coordinates in (x, y, w, h) order
 			# However, we need them in (top, right, bottom, left) order, so we do a reordering at here:
-			boxes = [(y, x + w, y + h, x) for (x, y, w, h) in rects]
+			rects = detector.detectMultiScale(gray, scaleFactor=1.1, minNeighbors=5, minSize=(30, 30))
+			for (x, y, w, h) in rects:
+				boxes = cv2.rectangle(rects, (x, y), (x + w, y + h), (255, 255, 255), 3)
+
+
+			# boxes = [(y, x + w, y + h, x) for (x, y, w, h) in rects]
 
 			# compute the facial embeddings for each face bounding box
 			encodings = face_recognition.face_encodings(rgb, boxes)
@@ -136,12 +141,11 @@ class Face_Recognition:
 			if args["Display"] > 0:
 				cv2.imshow("Frame", frame)
 				key = cv2.waitKey(1) & 0xFF
+				# if the `q` key was pressed, break from the loop
+				if key == ord("q"):
+					break
 
 			if self.RECOGNIZED == True:
-				break
-
-			# if the `q` key was pressed, break from the loop
-			if key == ord("q"):
 				break
 
 		# stop the timer and display FPS information

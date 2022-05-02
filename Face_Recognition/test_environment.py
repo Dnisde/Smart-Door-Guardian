@@ -4,7 +4,6 @@ from time import sleep
 from picamera import PiCamera
 
 import face_recognition
-import argparse
 import imutils
 import pickle
 import time
@@ -20,7 +19,7 @@ def test():
 
 	#camera warm-up time
 	sleep(2)
-	camera.capture( ‘image.jpg’ )
+	camera.capture( 'image.jpg’')
 	print("Test finishing, camera works good..")
 
 	# Test Video streaming by using camera
@@ -31,10 +30,8 @@ def test():
 	# if the `q` key was pressed, break from the loop
 	fps = FPS().start()
 
-	fps.update()
-	while True:
-		if key == ord("q"):
-			break
+	time.sleep(2.0)
+
 	# update the FPS counter
 
 	# stop the timer and display FPS information
