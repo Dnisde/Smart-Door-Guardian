@@ -1,4 +1,5 @@
 from imutils.video import VideoStream
+from imutils.video import FPS
 from time import sleep
 from picamera import PiCamera
 
@@ -28,7 +29,8 @@ def test():
 	time.sleep(2.0)
 
 	# if the `q` key was pressed, break from the loop
-	
+	fps = FPS().start()
+
 	fps.update()
 	while True:
 		if key == ord("q"):
@@ -37,7 +39,7 @@ def test():
 
 	# stop the timer and display FPS information
 	fps.stop()
-	
+
 	print("[INFO] elasped time: {:.2f}".format(fps.elapsed()))
 	print("[INFO] approx. FPS: {:.2f}".format(fps.fps()))
 	# do a bit of cleanup
