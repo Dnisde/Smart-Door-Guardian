@@ -41,7 +41,7 @@ class Face_Recognition:
 
 	def load_encoding(self):
 		# load the known faces and embeddings
-		args = self.build_arugment()
+		args = self.build_argument()
 		print("[INFO] loading encodings + face detector...")
 		data = pickle.loads(open(args["Encodings"], "rb").read())
 		# Instantiate our face detector using the OpenCV: Haar cascade method
