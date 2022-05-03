@@ -140,10 +140,10 @@ class Face_Recognition:
 				for reg in names:
 					if reg in self.host_name:
 						# In real time video, if recognize identity of the host, give 2 points of reward
-						self.RECOGNIZED = self.RECOGNIZED + 2
+						self.RECOGNIZED = self.RECOGNIZED + 5
 					else:
 						# In real time video, if not recognize identity of the host, give 1 point of penalty
-						self.RECOGNIZED = self.RECOGNIZED - 0.5
+						self.RECOGNIZED = self.RECOGNIZED - 1
 						# Greater than 0 points
 						
 					if self.RECOGNIZED < 0:	self.RECOGNIZED = 0
