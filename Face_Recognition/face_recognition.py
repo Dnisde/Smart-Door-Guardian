@@ -1,6 +1,7 @@
 # import the necessary packages
 from imutils.video import VideoStream
 from imutils.video import FPS
+import numpy as np
 import face_recognition
 import argparse
 import imutils
@@ -17,11 +18,9 @@ class Face_Recognition:
 		self.main()
 
 	def build_argument(self):
-		self.ap.add_argument("-o", "--Output", type=str, help="path to output video")
+		# self.ap.add_argument("-o", "--Output", type=str, help="path to output video")
 
 		self.ap.add_argument("-y", "--Display", type=int, default=1, help="whether or not to display output frame to screen")
-
-		# self.ap.add_argument("-i", "--Image", required=True, help="path to input image")
 
 		self.ap.add_argument("-e", "--Encodings", required=True, help="path to serialized db of facial encodings")
 
@@ -32,7 +31,9 @@ class Face_Recognition:
 		# Define and initialize the host_name of our program.
 		self.host_name = ["Chuwei Chen", "Taozhan Zhang", "Zhaozhong Qi"]
 
-		self.RECOGNIZED = False
+		self.RECOGNIZED = 0
+
+		self.fps = FPS()
 
 		args = vars(self.ap.parse_args())
 
@@ -46,7 +47,9 @@ class Face_Recognition:
 		data = pickle.loads(open(args["Encodings"], "rb").read())
 		# Instantiate our face detector using the OpenCV: Haar cascade method
 		# The method which is efficient to detect objects in images at multiple scales in realtime
-		detector = cv2.CascadeClassifier(args["Cascade"])
+		# detector = cv2.CascadeClassifier(args["Cascade"])
+		detector = cv2.CascadeClassifier(cv2.data.haarcascades + args["Cascade"])
+
 		return args, data, detector
 
 	def main(self):
@@ -56,21 +59,26 @@ class Face_Recognition:
 		# allow the camera sensor to warm up
 		print("[INFO] starting video stream...")
 		# Using Pi-Camera at here:
-		vs = VideoStream(-1).start()
+		vs = cv2.VideoCapture(0)
 		# Wait for the camera to warm up
 		time.sleep(2.0)
 
 		# Start our frames per second, FPS counter
-		fps = FPS().start()
+		fps = self.fps.start()
 
 		# Loop over frames from the video file stream, keep recognize the face until a certain signal comes up.
 		# Right now, it continues until we press the "q" in terminal, will change in the future.
 		while True:
 			# Grab a specific frame from the threaded video stream
 			# Grab the frame from the threaded video stream and resize it to 500px (to speedup processing)
-			_, frame = vs.read()
-			(w, h, c) = frame.shape
-			frame = cv2.resize(frame, (400, h))
+
+			# cv2.imshow('Imagetest',frame)
+			success, frame = vs.read()
+			if success == False:	
+				print("Read Error, check camera or devices, No frame can be read..")
+				return 
+
+			# frame = imutils.resize(frame, width=500)
 
 			# convert the input frame from
 			# (1) BGR to grayscale (for face detection)
@@ -82,52 +90,71 @@ class Face_Recognition:
 			# OpenCV returns bounding box coordinates in (x, y, w, h) order
 			# However, we need them in (top, right, bottom, left) order, so we do a reordering at here:
 			rects = detector.detectMultiScale(gray, scaleFactor=1.1, minNeighbors=5, minSize=(30, 30))
-			for (x, y, w, h) in rects:
-				boxes = cv2.rectangle(rects, (x, y), (x + w, y + h), (255, 255, 255), 3)
+			# for (x, y, w, h) in rects:
+			# 	box = cv2.rectangle(rects, (x, y), (x + w, y + h), (255, 255, 255), 3)
 
 
-			# boxes = [(y, x + w, y + h, x) for (x, y, w, h) in rects]
+			box = [(y, x + w, y + h, x) for (x, y, w, h) in rects]
 
-			# compute the facial embeddings for each face bounding box
-			encodings = face_recognition.face_encodings(rgb, boxes)
+			# compute the facial embeddings for each face bounding box extract from our camera frame
+			encodings = face_recognition.face_encodings(rgb, box)
 
-			# Initialize name variable for each time of the Face_Recognition Application Start:
+			# Initialize name variable for each time of the frame refreshed
 			names = []
 
 			# loop over the facial embeddings
-			for encoding in encodings:
+			for encode_frame in encodings:
 				# attempt to match each face in the input image to our known encodings
-				matches = face_recognition.compare_faces(data["Encodings"], encoding)
+				matches = face_recognition.compare_faces(data["encodings"], encode_frame, tolerance=0.4)
+				# print(matches)
 				# If the model cannot recognize the face in bounding box, it will show as: Unknown Face
 				name = "Unknown"
-
-				# check to see if we have found a match
+				# print(len(matches))
 				if True in matches:
+					# check to see if we have found a match
+					
 					# Find the indexes of all matched faces,
 					# then initialize a dictionary to count the total number of times each face was matched
 					matched_Index = [i for (i, b) in enumerate(matches) if b]
+
+					# print(matches)
+					# print(matched_Index)
+
 					counts = {}
 					# loop over the matched indexes and maintain a count for each recognized face.
 					for i in matched_Index:
 						name = data["names"][i]
 						counts[name] = counts.get(name, 0) + 1
+						# print(counts)
 
 					# Determine the recognized face with the largest number of votes by using K-Nearest-Neighbors.
 					# 	Note: in the event of an unlikely tie Python will select first entry in the dictionary
+						
 					name = max(counts, key=counts.get)
 
-				# If Found the familiar faces in our encoding frame
-				# update the list of names
 				names.append(name)
+			
+			# Each recgonized of frame, Check if there exist host:
+			if len(names) != 0:
+				# If there any existing faces appears in the frame
+				for reg in names:
+					if reg in self.host_name:
+						# In real time video, if recognize identity of the host, give 2 points of reward
+						self.RECOGNIZED = self.RECOGNIZED + 2
+					else:
+						# In real time video, if not recognize identity of the host, give 1 point of penalty
+						self.RECOGNIZED = self.RECOGNIZED - 0.5
+						# Greater than 0 points
+						
+					if self.RECOGNIZED < 0:	self.RECOGNIZED = 0
 
-				if name != "Unknown":
-					# Print the name of the recognized face in terminal
-					print(f"You are {name}")
-					self.RECOGNIZED = True
+					# Once score greater than a threshold, doors open signal will release..
+					if self.RECOGNIZED >= 70:	
+						self.finish_recognize(signal=True)
+						return
 
-
-			# loop over the recognized faces
-			for ((top, right, bottom, left), name) in zip(boxes, names):
+			# Extract the face rectangle from each frame of video (.per ts)
+			for ((top, right, bottom, left), name) in zip(box, names):
 				# draw the predicted face name on the image
 				cv2.rectangle(frame, (left, top), (right, bottom), (0, 255, 0), 2)
 				if top - 15 > 15:
@@ -136,71 +163,27 @@ class Face_Recognition:
 					y = top + 15
 				cv2.putText(frame, name, (left, y), cv2.FONT_HERSHEY_SIMPLEX, 0.75, (0, 255, 0), 2)
 
-			# check to see if we are supposed to display the output frame to
-			# the screen, Set display attribute to one to see if it is
+
+			# Check to see if we are supposed to display the output frame to the screen, Set display attribute to one to see if it is
 			if args["Display"] > 0:
 				cv2.imshow("Frame", frame)
 				key = cv2.waitKey(1) & 0xFF
 				# if the `q` key was pressed, break from the loop
 				if key == ord("q"):
-					break
+					self.finish_recognize()
+					return
 
-			if self.RECOGNIZED == True:
-				break
 
+	def finish_recognize(self, signal=False):
 		# stop the timer and display FPS information
-		fps.stop()
-		print("[INFO] elasped time: {:.2f}".format(fps.elapsed()))
-		print("[INFO] approx. FPS: {:.2f}".format(fps.fps()))
+		self.fps.stop()
+		print("[INFO] elasped time: {:.2f}".format(self.fps.elapsed()))
+		print("[INFO] approx. FPS: {:.2f}".format(self.fps.fps()))
 		# do a bit of cleanup
+		cv2.VideoCapture(0).release()
 		cv2.destroyAllWindows()
-		vs.stop()
-
-# def recognition_face_image(self):
-	# 	# initialize the list of names for each face detected
-	#
-	# 	# load the input image and convert it from BGR (OpenCV ordering) to dlib ordering (RGB)
-	# 	image = cv2.imread(args["Image"])
-	# 	# OpenCV orders color channels in BGR,
-	# 	# But the face_recognition module uses dlib, so before we proceed,
-	# 	# let’s swap color spaces on Line 37, naming the new image rgb.
-	# 	rgb = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
-	#
-	# 	# Detect the (x, y)-coordinates of the bounding boxes corresponding
-	# 	# to each face in the input image, then compute the facial embeddings for each face
-	# 	print("[INFO] recognizing faces...")
-	# 	boxes = face_recognition.face_locations(rgb, model=args["Model"])
-	#
-	# 	encodings = face_recognition.face_encodings(rgb, boxes)
-	#
-	# 	encodings = self.load_encoding()
-	#
-	# 	names = []
-	#
-	# 	# loop over the facial embeddings
-	# 	for encoding in encodings:
-	# 		# attempt to match each face in the input image to our known encodings
-	# 		matches = face_recognition.compare_faces(data["encodings"],encoding)
-	# 		name = "Unknown"
-	# 		# check to see if we have found a match
-	# 		if True in matches:
-	# 			# find the indexes of all matched faces then initialize a
-	# 			# dictionary to count the total number of times each face
-	# 			# was matched
-	# 			matchedIdxs = [i for (i, b) in enumerate(matches) if b]
-	# 			counts = {}
-	# 			# loop over the matched indexes and maintain a count for
-	# 			# each recognized face face
-	# 			for i in matchedIdxs:
-	# 				name = data["names"][i]
-	# 				counts[name] = counts.get(name, 0) + 1
-	# 			# determine the recognized face with the largest number of
-	# 			# votes (note: in the event of an unlikely tie Python will
-	# 			# select first entry in the dictionary)
-	# 			name = max(counts, key=counts.get)
-	#
-	# 		# update the list of names
-	# 		names.append(name)
+		if signal == True:
+			print("Doors open please..")
 
 
 Face_Recognition()
