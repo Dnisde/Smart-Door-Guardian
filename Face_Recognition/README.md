@@ -9,7 +9,8 @@
 
 `python encoding_face.py --Dataset Image_Dataset --Encodings ./Model_Encoded/hog.pickle --Model hog`
 
-\
+
+
 
 ### Recognize faces by using K-Nearest Neighbors:
 
