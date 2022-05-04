@@ -149,7 +149,7 @@ class Face_Recognition:
 					if self.RECOGNIZED < 0:	self.RECOGNIZED = 0
 
 					# Once score greater than a threshold, doors open signal will release..
-					if self.RECOGNIZED >= 70:	
+					if self.RECOGNIZED >= 30:	
 						self.finish_recognize(signal=True)
 						return
 
