@@ -13,4 +13,6 @@ One-click start: Users can decide one of the two measures to check its identity,
 
 The door system has the following states: Non-Start, Sleep and Alert. When Sleep, it does nothing until someone presses the IoT button to save power. In alert state, it will immediately inform the host to check the camera until the host deactivates the alert signal. The workflow of the door system is shown below.
 
+
 ![workflow](https://github.com/Dnisde/EC544_Smart-Door-Guardian/blob/main/Workflow.png?raw=true)
+
