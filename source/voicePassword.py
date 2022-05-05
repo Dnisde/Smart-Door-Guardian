@@ -45,16 +45,24 @@ if __name__ == '__main__':
 
 	# Read converted text from user
 	with open("converted.json") as f:
-		data = f.readlines()[1]
-		
-	data_json = json.loads(data)
-	convText = (data_json['result'][0]['alternative'][0]['transcript'])
+		linesCount = len(f.readlines())
+		if linesCount <= 1:
+			print("No voice detected!")
+		else:
+			data = f.readlines()[1]
 
-	print("\n" + convText)
+			data_json = json.loads(data)
+			convText = (data_json['result'][0]['alternative'][0]['transcript'])
 
-	password = "networking the physical world"
+			print("\n" + convText)
 
-	if convText == password:
-		publish_host()
-	else:
-		publish_unknown()
+			password = "networking the physical world"
+
+			if convText == password:
+			print("Password matched! Door open..")
+			publish_host()
+			else:
+			print("Wrong password..")
+			publish_unknown()
+
+	f.close()
