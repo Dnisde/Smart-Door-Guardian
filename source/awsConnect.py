@@ -62,21 +62,6 @@ def helloworld(self, params, packet):
 		# Do something
 		faceRecognition_start()
 
-		# Do something
-		with open("face_result.txt") as f:
-			line = f.readlines()
-			f.close()
-
-		# Send cooresponding text to topic
-		# if (line[0] == "Host"):
-		# 	publish_host()
-		# if (line[0] == "Unknown person"):
-		# 	publish_unknown()
-		# else:
-		# 	print("Face recognition failed!")
-		# Clear text file
-		f = open('face_result.txt', 'r+')
-		f.truncate(0)
 	elif text == voiceword:
 		voiceRecognition_start()
 
