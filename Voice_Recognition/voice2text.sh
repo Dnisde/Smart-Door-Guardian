@@ -14,4 +14,4 @@ cat converted.json
 rm test.wav
 # rm converted.txt
 
-python voicePassword.py
+python ./voicePassword.py
