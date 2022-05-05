@@ -51,17 +51,6 @@ lines = ["Host", "Unknown person"]
 obj = Face_Recognition()
 host = obj.main()
 
-# Write result to text file
-# if (host):
-# 	f = open("face_result.txt","a")
-# 	f.write(lines[0])
-# 	f.close()
-
-# else:
-# 	f = open("face_result.txt","a")
-# 	f.write(lines[1])
-# 	f.close()
-
 if (host):
 	publish_host()
 
@@ -69,4 +58,4 @@ elif (host == False):
 	publish_unknown()
 
 else:
-	print("OOOOps")
+	print("No person recognized")

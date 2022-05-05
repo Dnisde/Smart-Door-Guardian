@@ -147,7 +147,9 @@ class Face_Recognition:
 						# Greater than 0 points
 						
 					#if self.RECOGNIZED < 0:	self.RECOGNIZED = 0
-					if self.RECOGNIZED < 0:	return False
+					if self.RECOGNIZED < 0:	
+						print("Unknown person, no permission to enter..")
+						return False
 
 					# Once score greater than a threshold, doors open signal will release..
 					if self.RECOGNIZED >= 30:	

@@ -55,6 +55,8 @@ if __name__ == '__main__':
 	password = "networking the physical world"
 
 	if convText == password:
+		print("Password matched! Door open..")
 		publish_host()
 	else:
+		print("Wrong password..")
 		publish_unknown()
