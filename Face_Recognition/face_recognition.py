@@ -15,7 +15,6 @@ class Face_Recognition:
 		# construct the argument parser and parse the arguments
 		self.ap = argparse.ArgumentParser()
 		# Run the and Loop the face_recognition application
-		self.main()
 
 	def build_argument(self):
 		# self.ap.add_argument("-o", "--Output", type=str, help="path to output video")
@@ -31,7 +30,7 @@ class Face_Recognition:
 		# Define and initialize the host_name of our program.
 		self.host_name = ["Chuwei Chen", "Taozhan Zhang", "Zhaozhong Qi"]
 
-		self.RECOGNIZED = 0
+		self.RECOGNIZED = 5
 
 		self.fps = FPS()
 
@@ -52,7 +51,7 @@ class Face_Recognition:
 
 		return args, data, detector
 
-	def main(self):
+	def main(self) -> bool:
 		args, data, detector = self.load_encoding()
 		"Initialize Raspberry Pi camera: "
 		# Initialize the video stream and pointer to output video file, then
@@ -146,12 +145,12 @@ class Face_Recognition:
 						self.RECOGNIZED = self.RECOGNIZED - 1
 						# Greater than 0 points
 						
-					if self.RECOGNIZED < 0:	self.RECOGNIZED = 0
+					if self.RECOGNIZED < 0:	return False
 
 					# Once score greater than a threshold, doors open signal will release..
 					if self.RECOGNIZED >= 30:	
 						self.finish_recognize(signal=True)
-						return
+						return True
 
 			# Extract the face rectangle from each frame of video (.per ts)
 			for ((top, right, bottom, left), name) in zip(box, names):
@@ -173,6 +172,8 @@ class Face_Recognition:
 					self.finish_recognize()
 					return
 
+		return False
+
 
 	def finish_recognize(self, signal=False):
 		# stop the timer and display FPS information
@@ -185,6 +186,6 @@ class Face_Recognition:
 		if signal == True:
 			print("Doors open please..")
 
-
-Face_Recognition()
+obj = Face_Recognition()
+print(obj.main())
 
