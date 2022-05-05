@@ -29,7 +29,7 @@ if __name__ == '__main__':
     myMQTTClient = AWSIoTMQTTClient("Ccw_Mac_ID") #random key, if another connection using the same key is opened the previous one is auto closed by AWS IOT
     myMQTTClient.configureEndpoint("a2vv0cnk6n1beh-ats.iot.us-east-1.amazonaws.com", 8883)
 
-    myMQTTClient.configureCredentials("./Certificates/root-ca.pem", "./Certificates/private.pem.key", "./Certificates/certificate.pem.crt")
+    myMQTTClient.configureCredentials("../../Certificates/root-ca.pem", "../../Certificates/private.pem.key", "../../Certificates/certificate.pem.crt")
 
     myMQTTClient.configureOfflinePublishQueueing(-1) # Infinite offline Publish queueing
     myMQTTClient.configureDrainingFrequency(2) # Draining: 2 Hz
