@@ -15,7 +15,7 @@ def publish_host():
     myMQTTClient.publish(
         topic="$aws/things/k64f/shadow/update/accepted",
         QoS=1,
-        payload="Host, open the door")
+        payload="Password matched! Door open..")
 
     print("Published message to the topic!")
 
@@ -24,7 +24,7 @@ def publish_unknown():
     myMQTTClient.publish(
         topic="$aws/things/k64f/shadow/update/accepted",
         QoS=1,
-        payload="Unknown person!")
+        payload="Wrong password..")
 
     print("Published message to the topic!")
 
