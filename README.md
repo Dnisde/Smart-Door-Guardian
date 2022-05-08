@@ -2,7 +2,7 @@
 
 ## Introduction
 
-In this project, we plan to build a smart door guardian system that allows the user to enter  the home without bringing the key. In the meantime, the system is mainly designed by enhancing the security of the home and integrating techniques of the networking and physical world between devices and devices. The smart guardian system uses real-time face recognition as a primary option, that identifies whether the person is the host or not. The system also supports the recognition of the voice by asking user to provide voice password through a microphone.
+In this project, we designed and created a smart door guardian system that allows the users to enter their home without bringing the key. In the meantime, the system is mainly designed by enhancing the security of the home and implementing networkings between devices. The smart guardian system uses real-time face recognition as a primary option, that identifies whether the person is the host or not. The system also supports the recognition of the voice by asking user to provide voice password through a microphone.
 
 ## System Workflow
 
