@@ -17,3 +17,8 @@ The door system has the following states: Non-Start, Sleep and Alert. When Sleep
 
 ![workflow](https://github.com/Dnisde/EC544_Smart-Door-Guardian/blob/main/Workflow.png?raw=true)
 
+## Network Architecture
+
+We integrated the modules of AWS IoT button, the central computing module, and the door module as shown in figure below. Face recognition and voice recognition modules are implemented on the Raspberry Pi 4. The communication between AWS IoT button, the central computing module, and the door module is accomplished over AWS MQTT topic.
+
+![NetworkArchitecture](https://github.com/Dnisde/EC544_Smart-Door-Guardian/blob/main/Network%20Architecture.png?raw=true)
