@@ -1,4 +1,4 @@
-# EC544-SmartDoorBell-Final-Project
+# EC544-SmartDoorGuardian-Final-Project
 
 ## Introduction
 
